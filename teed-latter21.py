@@ -30,7 +30,7 @@ cs2 = cs * cs
 
 # Gas disk parameters
 eta_hat = 0.1 # Reduced radial pressure gradient (= eta / h)
-Reynolds = 1e7 # Reynolds number for setting viscosity / diffusion
+Reynolds = 1e5 # Reynolds number for setting viscosity / diffusion
 Schmidt = 1
 
 ReynoldsM = 1e4 # Magnetic Reynolds number
@@ -44,8 +44,8 @@ q = 1.0e-6 # Roberts q
 nuM = Omega0 * Hg**2 / ReynoldsM # Resistivity
 
 # Variable parameters
-big_lambda = 1.0e16
-N_squared = -0.1 # or 0.0
+#big_lambda = 1.0e16
+N_squared = -0.01 # or 0.0
 
 # Problem parameters
 kappa_squared = 1.0
@@ -55,16 +55,16 @@ omega_squared_power = -3.0
 eta = 2.34e17
 
 xi = q * eta
-alfven_velocity_squared = big_lambda * eta
+#alfven_velocity_squared = big_lambda * eta
 
 # Grid
 pert_amp = 1e-5 # perturbation amplitude (in units of dvgy / cs)
 
-kx_pert = 10
-kz_pert = 1
+kx_pert = 0.1 / np.sqrt(xi)
+kz_pert = 1.0 / np.sqrt(xi)
 
 # Box size, resolution, MPI mesh
-pert = 'random' # 'random' or 'eigen'
+pert = 'eigen' # 'random' or 'eigen'
 
 if pert == 'eigen':
     lambda_x = 2.0 * np.pi / np.abs(kx_pert) # lambda_x and lambda_y? Is that on purpose?
@@ -149,7 +149,7 @@ uz = u@ez
 problem = d3.IVP([u, uy, theta, p, tau_P], namespace=locals())
 problem.add_equation("dt(u) + grad(p) / rhog0 - 2 * Omega0 * uy * ex + N_squared * theta * ex - nu*lap(u) = -u@grad(u)")
 problem.add_equation("dt(uy) + Omega0 * (0.5 * ux - q * uz) - nu*lap(uy) = -u@grad(uy)")
-problem.add_equation("dt(theta) - ux - xi*lap(theta) = -u@grad(theta) -uy@grad(theta)*ey")
+problem.add_equation("dt(theta) - ux - xi*lap(theta) = -u@grad(theta)")
 problem.add_equation("div(u) + tau_P = 0")
 problem.add_equation("integ(p) = 0")
 
@@ -181,6 +181,31 @@ class OneFluidMatrices:
         matrix_a[4] = np.array([1, 0, 0, 0, -q * ksq / big_lambda])
 
     def Teed2021(self):
+        kx = self.kx; kz = self.kz
+        ikx = 1j * kx; ikz = 1j * kz
+        ksq = self.kx**2 + self.kz**2
+
+        matrix_a = np.zeros((5, 5), dtype = np.cdouble)
+        matrix_b = np.diag([0,1,1,1,1])
+
+        dissipation = nu * ksq
+
+        # [dP/rhog0, dux, duy, duz, dtheta]
+        matrix_a[0] = np.array([0, ikx, 0, ikz, 0])
+        matrix_a[1] = np.array([-ikx, -dissipation, 2.0 * Omega0, 0, -N_squared / omega_squared])
+        matrix_a[2] = np.array([0, -0.5 * Omega0, -dissipation, 0, 0])
+        matrix_a[3] = np.array([-ikz, 0, 0, -dissipation, 0])
+        matrix_a[4] = np.array([0, 1, 0, 0, -xi * ksq / kappa_squared])
+
+        #matrix_a[0] = np.array([0, ikx, 0, ikz, 0])
+        #matrix_a[1] = np.array([-ikx, -dissipation, 2.0 * Omega0, 0, -N_squared / omega_squared])
+        #matrix_a[2] = np.array([0, -0.5 * Omega0, -dissipation, vertical_shear_q * Omega0, 0])
+        #matrix_a[3] = np.array([-ikz, 0, 0, -dissipation, 0])
+        #matrix_a[4] = np.array([1, 0, 0, 0, -roberts_q * ksq / big_lambda])
+
+        return (matrix_a, matrix_b)
+
+    def Teed2021_broken(self):
         kx = self.kx; kz = self.kz
         ikx = 1j * kx; ikz = 1j * kz
         ksq = self.kx**2 + self.kz**2
@@ -229,12 +254,15 @@ def OneFluidEigen(kx, kz):
     eigenvector = eigenvectors[:, gmax]
 
     print("eigenvalue=",eigenvalue)
+    print("eigenvector=",eigenvector)
 
     if eigenvalue > 0:
         norm = eigenvector[2] # azimuthal gas velocity
         eigenvector *= pert_amp / norm * Hg * Omega0 # fix units
     if pert_amp == 0.0:
         eigenvector *= 0.0
+
+    print("normalized eigenvector=",eigenvector)
 
     return (eigenvalue, eigenvector)
 
@@ -247,11 +275,13 @@ if pert == 'eigen':
     dux = eigenvector[1]
     duy = eigenvector[2]
     duz = eigenvector[3]
+    dtheta = eigenvector[4]
 
     u['g'][0] = np.real(dux * expik)
     uy['g'] = np.real(duy * expik)
     u['g'][1] = np.real(duz * expik)
     p['g'] = np.real(dp * expik)
+    theta['g'] = np.real(dtheta * expik)
 
 elif pert == 'random':
     # Random perturbation in vgy
@@ -330,3 +360,4 @@ except:
     raise
 finally:
     solver.log_stats()
+
