@@ -30,7 +30,7 @@ cs2 = cs * cs
 
 # Gas disk parameters
 eta_hat = 0.1 # Reduced radial pressure gradient (= eta / h)
-Reynolds = 1e10 # Reynolds number for setting viscosity / diffusion
+Reynolds = 1e7 # Reynolds number for setting viscosity / diffusion
 Schmidt = 1
 
 ReynoldsM = 1e4 # Magnetic Reynolds number
@@ -38,7 +38,8 @@ ReynoldsM = 1e4 # Magnetic Reynolds number
 # Secondary parameters
 nu = Omega0 * Hg**2 / Reynolds # Viscosity and diffusion coefficient
 D = nu / Schmidt
-q = 0.0 # Ignore for now
+vertical_shear_q = 0.0 # Ignore for now
+q = 1.0e-6 # Roberts q
 
 nuM = Omega0 * Hg**2 / ReynoldsM # Resistivity
 
@@ -63,7 +64,7 @@ kx_pert = 10
 kz_pert = 1
 
 # Box size, resolution, MPI mesh
-pert = 'eigen' # 'random' or 'eigen'
+pert = 'random' # 'random' or 'eigen'
 
 if pert == 'eigen':
     lambda_x = 2.0 * np.pi / np.abs(kx_pert) # lambda_x and lambda_y? Is that on purpose?
@@ -71,7 +72,7 @@ if pert == 'eigen':
     Lx, Ly, Lz = lambda_x, lambda_x, lambda_z
 
 else:
-    Lbox = 2.0 * Hg
+    Lbox = 2.0 * np.pi * Hg
     Lx, Ly, Lz = Lbox, Lbox, Lbox
     low_pass_scales = 0.25
 
@@ -146,9 +147,9 @@ uz = u@ez
 
 # Problem
 problem = d3.IVP([u, uy, theta, p, tau_P], namespace=locals())
-problem.add_equation("dt(u) + grad(p) / rhog0 - 2 * Omega0 * uy * ex - nu*lap(u) = -u@grad(u)")
+problem.add_equation("dt(u) + grad(p) / rhog0 - 2 * Omega0 * uy * ex + N_squared * theta * ex - nu*lap(u) = -u@grad(u)")
 problem.add_equation("dt(uy) + Omega0 * (0.5 * ux - q * uz) - nu*lap(uy) = -u@grad(uy)")
-problem.add_equation("dt(theta) - ux - xi*lap(theta) = -u@grad(theta)")
+problem.add_equation("dt(theta) - ux - xi*lap(theta) = -u@grad(theta) -uy@grad(theta)*ey")
 problem.add_equation("div(u) + tau_P = 0")
 problem.add_equation("integ(p) = 0")
 
