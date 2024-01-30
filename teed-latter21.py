@@ -218,7 +218,7 @@ class OneFluidMatrices:
         #[dvgx, dvgy, dtheta]
         matrix_a[0] = np.array([0, 2, -N_squared / omega_squared])
         matrix_a[1] = np.array([-0.5, 0, 0])
-        matrix_a[2] = np.array([1, 0, -q * ksq / big_lambda])
+        matrix_a[2] = np.array([1, 0, -xi * ksq * kappa_squared])
 
         return (matrix_a, matrix_b)
 

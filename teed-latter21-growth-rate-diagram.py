@@ -35,7 +35,7 @@ nu = Omega0 * Hg**2 / Reynolds # Viscosity and diffusion coefficient
 pert_amp = 1.0e-6
 
 # Variable parameters
-N_squared = -0.01 #-0.1 # or 0.0
+N_squared = -0.1 #-0.1 # or 0.0
 
 # Problem parameters
 kappa_squared = 1.0
@@ -141,6 +141,7 @@ dpi = 100
 cmap = "seismic_r"
 
 version = None
+version = 2
 save_directory = "."
 
 log_axes = True
