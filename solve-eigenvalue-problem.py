@@ -3,7 +3,7 @@ Solve fifth-order characteristic equation to reproduce Figure 1 from Latter+ 201
 """
 
 import matplotlib
-matplotlib.use('Agg')
+#matplotlib.use('Agg')
 from matplotlib import rcParams as rc
 from matplotlib import pyplot as plot
 
@@ -88,7 +88,8 @@ def get_growth_rates(big_lambda = 1.0e16, N_squared = -0.1):
         #print roots
         print
 
-    return ks * np.sqrt(alfven_velocity_squared), growth_rates
+    #return ks * np.sqrt(alfven_velocity_squared), growth_rates
+    return ks, growth_rates
 
 ks, growth_rates1 = get_growth_rates(big_lambda = 1.0e10, N_squared = -0.1)
 ks, growth_rates2 = get_growth_rates(big_lambda = 1.0, N_squared = 0.0)
@@ -102,24 +103,26 @@ labelsize = 16
 
 def make_plot():
     #plot.figure()
-    x = ks # * np.sqrt(alfven_velocity_squared)
+    x = ks #* np.sqrt(alfven_velocity_squared)
     y1 = growth_rates1
     y2 = growth_rates2
     y3 = growth_rates3
-    plot.plot(x, y1, c = 'purple', linewidth = linewidth, linestyle = "--")
-    plot.plot(x, y2, c = 'r', linewidth = linewidth, linestyle = "--")
-    plot.plot(x, y3, c = 'b', linewidth = linewidth, linestyle = "-")
+    plot.plot(x, y1, c = 'purple', linewidth = linewidth, linestyle = "--", label = r"$\Lambda = \infty$, $\mathrm{N}^2 = -0.1$")
+    plot.plot(x, y2, c = 'r', linewidth = linewidth, linestyle = "--", label = r"$\Lambda = 1$, $\mathrm{N}^2 = 0$")
+    plot.plot(x, y3, c = 'b', linewidth = linewidth, linestyle = "-", label = r"$\Lambda = 1$, $\mathrm{N}^2 = -0.1$")
+
+    plot.legend(loc = "upper right")
 
     plot.xlim(min(x), max(x))
     plot.ylim(0, 0.8)
 
-    plot.xlabel(r"$k$", fontsize = fontsize)
-    plot.ylabel(r"$s$", fontsize = fontsize)
+    plot.xlabel(r"$k$ $[\Omega / v_\mathrm{A}]$", fontsize = fontsize)
+    plot.ylabel(r"$s$ $[\Omega]$", fontsize = fontsize)
     plot.title("Latter+ 2010: Figure 1 (reproduced)", fontsize = fontsize + 1)
 
     plot.xscale("log")
 
-    plot.savefig("latter2010-fig1-reproduced-from-matrix.png")
+    plot.savefig("latter2010-fig1-reproduced-from-matrix.png", bbox_inches = "tight")
     plot.show()
 
 
