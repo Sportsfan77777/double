@@ -1,3 +1,4 @@
+import os
 import numpy as np
 from scipy.ndimage import filters as ff
 import csv
@@ -22,14 +23,19 @@ plot.figure()
 
 x = analysis[:, 0] #/ (2.0 * np.pi)
 y = analysis[:, 1]
-y2 = smooth(y, 10)
+y2 = smooth(y, 1)
 y3 = np.diff(np.log(y2)) / np.diff(x)
 
 #print min(y3), max(y3)
 
+growth = 0.05
+plot.plot([0, max(x)], [growth, growth], c = 'k', linewidth = linewidth)
+
 plot.plot(x, y, linewidth = linewidth, alpha = 0.6)
 plot.plot(x, y2, linewidth = linewidth)
 plot.plot(x[:-1], y3, linewidth = linewidth)
+
+print(max(y3))
 
 #print( len(x), len(y))
 
@@ -43,4 +49,5 @@ plot.xlabel('t', fontsize = fontsize)
 plot.ylabel(r'max($\delta v$)', fontsize = fontsize)
 plot.title('Growth Rate Test', fontsize = fontsize + 1)
 
-plot.savefig("growth-rate-log.png", bbox_inches = 'tight')
+cwd = os.getcwd().split("/")[-1]
+plot.savefig("growth-rate-log-%s.png" % cwd, bbox_inches = 'tight')

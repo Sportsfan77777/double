@@ -24,7 +24,7 @@ cs = Hg * Omega0
 cs2 = cs * cs
 
 # Secondary parameters
-logReynolds = 7
+logReynolds = 8
 Reynolds = np.power(10, logReynolds) # Reynolds number for setting viscosity / diffusion
 
 ten_q = 0.5
@@ -37,15 +37,15 @@ nuM = nu
 pert_amp = 1.0e-6
 
 # Variable parameters
-big_lambda = 1.0 # 1.0e16 or 1.0
-N_squared = -0.1 #-0.1 # or 0.0
+big_lambda = 1.0e10 # 1.0e16 or 1.0
+N_squared = 0.1 #-0.1 # or 0.0
 
 # Problem parameters
 kappa_squared = 1.0
 omega_squared = 1.0
 omega_power = -1.5
 omega_squared_power = -3.0
-eta = 2.34e12
+eta = 2.34e17
 xi = roberts_q * eta
 
 beta = 1.0e5 # Plasma beta parameter for (inverse) vertical field strength
@@ -124,6 +124,31 @@ class OneFluidMatrices:
 
         return (matrix_a, matrix_b)
 
+    def Latter2010xz_hall(self, big_lambda_H = 0.2):
+        kx = self.kx; kz = self.kz
+        ikx = 1j * kx; ikz = 1j * kz
+        ksq = self.kx**2 + self.kz**2
+
+        matrix_a = np.zeros((8, 8), dtype = np.cdouble)
+        matrix_b = np.diag([0,1,1,1,1,1,1,1])
+
+        dissipation = nu * ksq
+        dissipationM = nuM * ksq
+
+        # REMEMBER TO ADD IN DISSIPATION
+
+        #[dP/rhog0, dvgx, dvgy, dvgz, dBx, dBy, dBz, dtheta]
+        matrix_a[0] = np.array([0, ikx, 0, ikz, 0, 0, 0, 0])
+        matrix_a[1] = np.array([-ikx, -dissipation, 2, 0, ikz, 0, 0, -N_squared / omega_squared])
+        matrix_a[2] = np.array([0, -0.5, -dissipation, 0, 0, ikz, 0, 0])
+        matrix_a[3] = np.array([-ikz, 0, 0, -dissipation, 0, 0, ikz, 0])
+        matrix_a[4] = np.array([0, ikz, 0, 0, -ksq / big_lambda, -0.5 * np.power(kz, 2.0) / big_lambda_H, 0, 0])
+        matrix_a[5] = np.array([0, 0, ikz, 0, omega_power + 0.5 * np.power(kz, 2.0) / big_lambda_H, -ksq / big_lambda, -0.5 * kx * kz / big_lambda_H, 0])
+        matrix_a[6] = np.array([0, 0, 0, ikz, 0, 0.5 * kx * kz / big_lambda_H, -ksq / big_lambda, 0])
+        matrix_a[7] = np.array([0, 1, 0, 0, 0, 0, 0, -q * ksq / big_lambda])
+
+        return (matrix_a, matrix_b)
+
     def Latter2010xz_v0(self):
         kx = self.kx; kz = self.kz
         ikx = 1j * kx; ikz = 1j * kz
@@ -145,6 +170,31 @@ class OneFluidMatrices:
         matrix_a[4] = np.array([0, ikz, 0, 0, -ksq * eta - dissipationM, 0, 0, 0])
         matrix_a[5] = np.array([0, 0, ikz, 0, omega_power, -ksq * eta - dissipationM, 0, 0])
         matrix_a[6] = np.array([0, 0, 0, ikz, 0, 0, -ksq * eta - dissipationM, 0])
+        matrix_a[7] = np.array([0, 1.0, 0, 0, 0, 0, 0, -xi * ksq])
+
+        return (matrix_a, matrix_b)
+
+    def Latter2010xz_v0_hall(self, big_lambda_H = 0.2):
+        kx = self.kx; kz = self.kz
+        ikx = 1j * kx; ikz = 1j * kz
+        ksq = self.kx**2 + self.kz**2
+
+        matrix_a = np.zeros((8, 8), dtype = np.cdouble)
+        matrix_b = np.diag([0,1,1,1,1,1,1,1])
+
+        dissipation = nu * ksq
+        dissipationM = nuM * ksq
+
+        # REMEMBER TO ADD IN DISSIPATION
+
+        #[dP/rhog0, dvgx, dvgy, dvgz, dBx, dBy, dBz, dtheta]
+        matrix_a[0] = np.array([0, ikx, 0, ikz, 0, 0, 0, 0])
+        matrix_a[1] = np.array([-ikx, -dissipation, 2.0, 0, ikz * alfven_velocity_squared, 0, 0, -N_squared / omega_squared])
+        matrix_a[2] = np.array([0, -0.5, -dissipation, 0, 0, ikz * alfven_velocity_squared, 0, 0])
+        matrix_a[3] = np.array([-ikz, 0, 0, -dissipation, 0, 0, ikz * alfven_velocity_squared, 0])
+        matrix_a[4] = np.array([0, ikz, 0, 0, -ksq * eta, -0.5 * np.power(kz, 2.0) / big_lambda_H, 0, 0])
+        matrix_a[5] = np.array([0, 0, ikz, 0, omega_power + 0.5 * np.power(kz, 2.0) / big_lambda_H, -ksq * eta, -0.5 * kx * kz / alfven_velocity_squared / big_lambda_H, 0]) # Careful about the negative signs! (Remember the negative from k^2)
+        matrix_a[6] = np.array([0, 0, 0, ikz, 0, 0.5 * kx * kz / alfven_velocity_squared / big_lambda_H, -ksq * eta, 0])
         matrix_a[7] = np.array([0, 1.0, 0, 0, 0, 0, 0, -xi * ksq])
 
         return (matrix_a, matrix_b)
@@ -199,7 +249,7 @@ class OneFluidMatrices:
 
 def OneFluidEigen(kx, kz):
     matrix = OneFluidMatrices(kx, kz)
-    a, b = matrix.Latter2010xz_v0()
+    a, b = matrix.Latter2010xz_hall(big_lambda_H = -0.4)
 
     try:
         eigenvalues, eigenvectors = scipy.linalg.eig(a, b)
@@ -246,7 +296,7 @@ dpi = 100
 cmap = "seismic_r"
 
 version = None
-version = 90
+#version = 90
 save_directory = "."
 
 log_axes = True
@@ -254,6 +304,8 @@ log_axes = True
 def make_plot(show = True):
     fig = plot.figure(figsize = (7, 6), dpi = dpi)
     ax = fig.add_subplot(111)
+
+    hall_i = 0
 
     # Data
     num_ks = 200
@@ -266,8 +318,8 @@ def make_plot(show = True):
     #kzs = np.linspace(1, 1e5, num_ks)
 
     if log_axes:
-        kxs = np.logspace(-2, 2, num_ks) / np.sqrt(alfven_velocity_squared)
-        kzs = np.logspace(-2, 2, num_ks) / np.sqrt(alfven_velocity_squared)
+        kxs = np.logspace(-2, 2, num_ks) #/ np.sqrt(alfven_velocity_squared)
+        kzs = np.logspace(-2, 2, num_ks) #/ np.sqrt(alfven_velocity_squared)
 
     growth_rates = np.zeros((len(kxs), len(kzs)))
 
@@ -306,10 +358,10 @@ def make_plot(show = True):
         plot.yscale("log")
 
     # Annotate
-    #plot.xlabel(r'$k_\mathrm{z}$ $(\Omega / v_\mathrm{A})$', fontsize = fontsize)
-    #plot.ylabel(r'$k_\mathrm{x}$ $(\Omega / v_\mathrm{A})$', fontsize = fontsize)
-    plot.xlabel(r'$k_\mathrm{z}$ $(\Omega / v_\mathrm{0})$', fontsize = fontsize)
-    plot.ylabel(r'$k_\mathrm{x}$ $(\Omega / v_\mathrm{0})$', fontsize = fontsize)
+    plot.xlabel(r'$k_\mathrm{z}$ $(\Omega / v_\mathrm{A})$', fontsize = fontsize)
+    plot.ylabel(r'$k_\mathrm{x}$ $(\Omega / v_\mathrm{A})$', fontsize = fontsize)
+    #plot.xlabel(r'$k_\mathrm{z}$ $(\Omega / v_\mathrm{0})$', fontsize = fontsize)
+    #plot.ylabel(r'$k_\mathrm{x}$ $(\Omega / v_\mathrm{0})$', fontsize = fontsize)
     plot.title(r'Growth Rates (Latter+ 2010)', fontsize = fontsize + 1)
 
     x_text = 0.04 * max(x); y_text = 0.92 * max(x)
@@ -319,9 +371,9 @@ def make_plot(show = True):
 
     # Save, Show, and Close
     if version is None:
-        save_fn = "%s/latter10xz-v0-growth-rate-diagram-Re%d.png" % (save_directory, logReynolds)
+        save_fn = "%s/latter10xz-v0-growth-rate-diagram-Re%d-with-hall-%04d.png" % (save_directory, logReynolds, hall_i)
     else:
-        save_fn = "%s/v%04d_latter10xz-v0-growth-rate-diagram-Re%d.png" % (save_directory, version, logReynolds)
+        save_fn = "%s/v%04d_latter10xz-v0-growth-rate-diagram-Re%d-with-hall-%04d.png" % (save_directory, version, logReynolds, hall_i)
     plot.savefig(save_fn, bbox_inches = 'tight', dpi = dpi)
 
     if show:

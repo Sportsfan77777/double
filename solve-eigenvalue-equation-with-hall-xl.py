@@ -54,12 +54,12 @@ def get_growth_rates(big_lambda = 1.0e16, N_squared = -0.1, big_lambda_H = 0.2):
         matrix[2, 0] = I * k
         matrix[2, 1] = 0
         matrix[2, 2] = -np.power(k, 2.0) / big_lambda
-        matrix[2, 3] = -0.5 * np.power(k, 2.0) / big_lambda_H
+        matrix[2, 3] = -0.5 * np.power(k, 2.0) / big_lambda_H # Note: \eta_H = c / (4 \pi n_e e) = 0.5 / Ha  [But... are the Hall minus signs backwards??? There is a negative already there, plus another from the k^2!!]
         matrix[2, 4] = 0
 
         matrix[3, 0] = 0
         matrix[3, 1] = I * k
-        matrix[3, 2] = omega_power + 0.5 * np.power(k, 2.0) / big_lambda_H
+        matrix[3, 2] = omega_power + 0.5 * np.power(k, 2.0) / big_lambda_H # Ha = v_A^2 / v_H^2; and v_H^2 = \Omega B_0 c / (2 \pi n_e e)
         matrix[3, 3] = -np.power(k, 2.0) / big_lambda
         matrix[3, 4] = 0
 
