@@ -38,17 +38,17 @@ pert_amp = 1.0e-6
 
 # Variable parameters
 big_lambda = 1.0e10 # 1.0e16 or 1.0
-N_squared = 0.1 #-0.1 # or 0.0
+N_squared = 0.0 #-0.1 # or 0.0
 
 # Problem parameters
 kappa_squared = 1.0
 omega_squared = 1.0
 omega_power = -1.5
 omega_squared_power = -3.0
-eta = 2.34e17
+eta = 2.34e12
 xi = roberts_q * eta
 
-beta = 1.0e5 # Plasma beta parameter for (inverse) vertical field strength
+beta = 1.0e4 # Plasma beta parameter for (inverse) vertical field strength
 #va2 = 2.0 * cs2 / beta # Alfven velocity squared
 alfven_velocity_squared = 2.0 * cs2 / beta # Alfven velocity squared
 eta = alfven_velocity_squared / big_lambda
@@ -192,9 +192,9 @@ class OneFluidMatrices:
         matrix_a[1] = np.array([-ikx, -dissipation, 2.0, 0, ikz * alfven_velocity_squared, 0, 0, -N_squared / omega_squared])
         matrix_a[2] = np.array([0, -0.5, -dissipation, 0, 0, ikz * alfven_velocity_squared, 0, 0])
         matrix_a[3] = np.array([-ikz, 0, 0, -dissipation, 0, 0, ikz * alfven_velocity_squared, 0])
-        matrix_a[4] = np.array([0, ikz, 0, 0, -ksq * eta, -0.5 * np.power(kz, 2.0) / big_lambda_H, 0, 0])
-        matrix_a[5] = np.array([0, 0, ikz, 0, omega_power + 0.5 * np.power(kz, 2.0) / big_lambda_H, -ksq * eta, -0.5 * kx * kz / alfven_velocity_squared / big_lambda_H, 0]) # Careful about the negative signs! (Remember the negative from k^2)
-        matrix_a[6] = np.array([0, 0, 0, ikz, 0, 0.5 * kx * kz / alfven_velocity_squared / big_lambda_H, -ksq * eta, 0])
+        matrix_a[4] = np.array([0, ikz, 0, 0, -ksq * eta, -0.5 * np.power(kz, 2.0) * alfven_velocity_squared / big_lambda_H, 0, 0])
+        matrix_a[5] = np.array([0, 0, ikz, 0, omega_power + 0.5 * np.power(kz, 2.0) * alfven_velocity_squared / big_lambda_H, -ksq * eta, -0.5 * kx * kz * alfven_velocity_squared / big_lambda_H, 0]) # Careful about the negative signs! (Remember the negative from k^2)
+        matrix_a[6] = np.array([0, 0, 0, ikz, 0, 0.5 * kx * kz * alfven_velocity_squared / big_lambda_H, -ksq * eta, 0])
         matrix_a[7] = np.array([0, 1.0, 0, 0, 0, 0, 0, -xi * ksq])
 
         return (matrix_a, matrix_b)
@@ -249,7 +249,7 @@ class OneFluidMatrices:
 
 def OneFluidEigen(kx, kz):
     matrix = OneFluidMatrices(kx, kz)
-    a, b = matrix.Latter2010xz_hall(big_lambda_H = -0.4)
+    a, b = matrix.Latter2010xz_v0_hall(big_lambda_H = -0.4)
 
     try:
         eigenvalues, eigenvectors = scipy.linalg.eig(a, b)
@@ -318,8 +318,8 @@ def make_plot(show = True):
     #kzs = np.linspace(1, 1e5, num_ks)
 
     if log_axes:
-        kxs = np.logspace(-2, 2, num_ks) #/ np.sqrt(alfven_velocity_squared)
-        kzs = np.logspace(-2, 2, num_ks) #/ np.sqrt(alfven_velocity_squared)
+        kxs = np.logspace(-2, 2, num_ks) / np.sqrt(alfven_velocity_squared)
+        kzs = np.logspace(-2, 2, num_ks) / np.sqrt(alfven_velocity_squared)
 
     growth_rates = np.zeros((len(kxs), len(kzs)))
 
@@ -358,10 +358,10 @@ def make_plot(show = True):
         plot.yscale("log")
 
     # Annotate
-    plot.xlabel(r'$k_\mathrm{z}$ $(\Omega / v_\mathrm{A})$', fontsize = fontsize)
-    plot.ylabel(r'$k_\mathrm{x}$ $(\Omega / v_\mathrm{A})$', fontsize = fontsize)
-    #plot.xlabel(r'$k_\mathrm{z}$ $(\Omega / v_\mathrm{0})$', fontsize = fontsize)
-    #plot.ylabel(r'$k_\mathrm{x}$ $(\Omega / v_\mathrm{0})$', fontsize = fontsize)
+    #plot.xlabel(r'$k_\mathrm{z}$ $(\Omega / v_\mathrm{A})$', fontsize = fontsize)
+    #plot.ylabel(r'$k_\mathrm{x}$ $(\Omega / v_\mathrm{A})$', fontsize = fontsize)
+    plot.xlabel(r'$k_\mathrm{z}$ $(\Omega / v_\mathrm{0})$', fontsize = fontsize)
+    plot.ylabel(r'$k_\mathrm{x}$ $(\Omega / v_\mathrm{0})$', fontsize = fontsize)
     plot.title(r'Growth Rates (Latter+ 2010)', fontsize = fontsize + 1)
 
     x_text = 0.04 * max(x); y_text = 0.92 * max(x)
