@@ -17,6 +17,7 @@ matplotlib.use('Agg')
 from matplotlib import rcParams as rc
 from matplotlib import pyplot as plot
 
+import h5py
 import util
 
 #from colormaps import cmaps
@@ -100,7 +101,7 @@ show = args.show
 
 version = args.version
 if args.r_lim is None:
-    x_min = r_min; x_max = r_max
+    pass #x_min = r_min; x_max = r_max
 else:
     x_min = args.r_lim[0]; x_max = args.r_lim[1]
 
@@ -141,12 +142,12 @@ def make_plot(frame, show = False):
 
     period = 2.0 * np.pi
 
-    var = "vx"
+    var = "ux"
     output  = h5py.File("snapshots/snapshots_s%d.h5" % frame, mode = 'r')
     times    = output['scales']['sim_time'][:] / period
     vx_data    = output['tasks'][var]
     #for m in range(0, snapshots_per_set):
-    vx3D      = data[0]
+    vx3D      = vx_data[0]
     #times[i]    = time[0]
     vxXZ      = vx3D[:,0,:]
     #data2D[i,:] = np.mean(vxXZ, axis = 1)
