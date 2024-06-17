@@ -13,7 +13,9 @@ def get_frame_range(frame_selection):
         start = frame_selection[0]; end = frame_selection[1]; rate = frame_selection[2]
         frame_range = range(start, end + 1, rate)
     else:
-        print "Error: Must supply 1, 2, or 3 frame arguments\nWith one argument, plots single frame\nWith two arguments, plots range(start, end + 1)\nWith three arguments,$
+        print "Error: Must supply 1, 2, or 3 frame arguments\nWith one argument, plots single frame\nWith two arguments, plots range(start, end + 1)\nWith three arguments, plots range(start, end + 1, rate)"
         exit()
 
     return frame_range
+
+
