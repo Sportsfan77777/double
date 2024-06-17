@@ -147,12 +147,9 @@ def make_plot(frame, show = False):
     times    = output['scales']['sim_time'][:] / period
     vx_data    = output['tasks'][var]
 
-    print(np.shape(vx_data.dims[1][0]))
-
     xs   = vx_data.dims[1][0][:]
     zs   = vx_data.dims[2][0][:]
 
-    print(np.shape(vx_data))
     #for m in range(0, snapshots_per_set):
     vx3D      = vx_data[0]
     #times[i]    = time[0]
@@ -160,14 +157,13 @@ def make_plot(frame, show = False):
     #data2D[i,:] = np.mean(vxXZ, axis = 1)
 
     velocity = vxXZ
-    print(np.max(velocity))
 
     ### Plot ###
     x = xs
     y = zs
     result = ax.pcolormesh(x, y, np.transpose(velocity), cmap = cmap)
 
-    fig.colorbar(result)
+    cbar = fig.colorbar(result)
     result.set_clim(clim[0], clim[1])
 
     # Axes
