@@ -173,7 +173,7 @@ def make_plot(frame, show = False):
     title2 = r"$t = %d$ $\mathrm{orbits}$" % (frame)
     plot.title("%s" % (title2), y = 1.015, fontsize = fontsize + 1)
 
-    cbar.set_label(r"$vx$", fontsize = fontsize, rotation = 270, labelpad = 25)
+    cbar.set_label(r"$v_\mathrm{x}$", fontsize = fontsize, rotation = 270, labelpad = 25)
 
     # Save, Show, and Close
     if version is None:
