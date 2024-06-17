@@ -65,7 +65,7 @@ def new_argument_parser(description = "Plot gas density maps."):
     # Plot Parameters (rarely need to change)
     parser.add_argument('--cmap', dest = "cmap", default = "seismic",
                          help = 'color map (default: seismic)')
-    parser.add_argument('--cmax', dest = "cmax", type = float, default = 0.2,
+    parser.add_argument('--cmax', dest = "cmax", type = float, default = 0.0002,
                          help = 'maximum radial velocity in colorbar (default: 0.2)')
 
     parser.add_argument('--fontsize', dest = "fontsize", type = int, default = 16,
@@ -132,7 +132,7 @@ rc['xtick.labelsize'] = labelsize
 rc['ytick.labelsize'] = labelsize
 
 def make_plot(frame, show = False):
-	# Set up figure
+    # Set up figure
     fig = plot.figure(figsize = (7, 6), dpi = dpi)
     ax = fig.add_subplot(111)
 
@@ -146,17 +146,25 @@ def make_plot(frame, show = False):
     output  = h5py.File("snapshots/snapshots_s%d.h5" % frame, mode = 'r')
     times    = output['scales']['sim_time'][:] / period
     vx_data    = output['tasks'][var]
+
+    print(np.shape(vx_data.dims[1][0]))
+
+    xs   = vx_data.dims[1][0][:]
+    zs   = vx_data.dims[2][0][:]
+
+    print(np.shape(vx_data))
     #for m in range(0, snapshots_per_set):
     vx3D      = vx_data[0]
     #times[i]    = time[0]
-    vxXZ      = vx3D[:,0,:]
+    vxXZ      = vx3D[:,:]
     #data2D[i,:] = np.mean(vxXZ, axis = 1)
 
     velocity = vxXZ
+    print(np.max(velocity))
 
     ### Plot ###
-    x = rad
-    y = theta * (180.0 / np.pi)
+    x = xs
+    y = zs
     result = ax.pcolormesh(x, y, np.transpose(velocity), cmap = cmap)
 
     fig.colorbar(result)
@@ -166,10 +174,12 @@ def make_plot(frame, show = False):
     plot.xlabel(r"$x$", fontsize = fontsize)
     plot.ylabel(r"$z$", fontsize = fontsize)
 
-    title2 = r"$t = %d$ $\mathrm{orbits}}$" % (frame)
+    title2 = r"$t = %d$ $\mathrm{orbits}$" % (frame)
     plot.title("%s" % (title2), y = 1.015, fontsize = fontsize + 1)
 
-	# Save, Show, and Close
+    cbar.set_label(r"$vx$", fontsize = fontsize, rotation = 270, labelpad = 25)
+
+    # Save, Show, and Close
     if version is None:
         save_fn = "%s/radialVelocityMap_%04d.png" % (save_directory, frame)
     else:
