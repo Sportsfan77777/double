@@ -76,6 +76,9 @@ def new_argument_parser(description = "Plot gas density maps."):
 
 ###############################################################################
 
+### Parse Arguments ###
+args = new_argument_parser().parse_args()
+
 ### Get Input Parameters ###
 
 # Frames
