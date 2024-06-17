@@ -37,12 +37,6 @@ def new_argument_parser(description = "Plot gas density maps."):
     # Files
     parser.add_argument('--dir', dest = "save_directory", default = "radialVelocityMaps",
                          help = 'save directory (default: radialVelocityMaps)')
-    parser.add_argument('-n', dest = "dust_number", type = int, default = 1,
-                         help = 'number (1, 2, or 3) corresponding to different dust sizes (default: 1)')
-    parser.add_argument('--mpi', dest = "mpi", action = 'store_true', default = False,
-                         help = 'use .mpio output files (default: use dat)')
-    parser.add_argument('--merge', dest = "merge", type = int, default = 0,
-                         help = 'number of cores needed to merge data outputs (default: 0)')
 
     # Plot Parameters (variable)
     parser.add_argument('--hide', dest = "show", action = 'store_false', default = True,
@@ -52,8 +46,6 @@ def new_argument_parser(description = "Plot gas density maps."):
 
     parser.add_argument('--range', dest = "r_lim", type = float, nargs = 2, default = None,
                          help = 'radial range in plot (default: [r_min, r_max])')
-    parser.add_argument('--shift', dest = "center", action = 'store_true', default = False,
-                         help = 'center frame on vortex peak or middle (default: do not center)')
 
     # Plot Parameters (contours)
     parser.add_argument('--contour', dest = "use_contours", action = 'store_true', default = False,
@@ -82,6 +74,46 @@ def new_argument_parser(description = "Plot gas density maps."):
 
 ###############################################################################
 
+### Get Input Parameters ###
+
+# Frames
+frame_range = util.get_frame_range(args.frames)
+
+# Number of Cores 
+num_cores = args.num_cores
+
+# Files
+save_directory = args.save_directory
+if not os.path.isdir(save_directory):
+    os.mkdir(save_directory) # make save directory if it does not already exist
+
+# Plot Parameters (variable)
+show = args.show
+
+#rad = np.linspace(r_min, r_max, num_rad)
+#theta = np.linspace(0, 2 * np.pi, num_theta)
+
+version = args.version
+if args.r_lim is None:
+    x_min = r_min; x_max = r_max
+else:
+    x_min = args.r_lim[0]; x_max = args.r_lim[1]
+
+# Plot Parameters (contours)
+use_contours = args.use_contours
+low_contour = args.low_contour
+high_contour = args.high_contour
+num_levels = args.num_levels
+if num_levels is None:
+    separation = args.separation
+    num_levels = int(round((high_contour - low_contour) / separation + 1, 0))
+
+# Plot Parameters (constant)
+cmap = args.cmap
+clim = [-args.cmax, args.cmax]
+
+fontsize = args.fontsize
+dpi = args.dpi
 
 ###############################################################################
 
@@ -124,6 +156,12 @@ def make_plot(frame, show = False):
     fig.colorbar(result)
     result.set_clim(clim[0], clim[1])
 
+    # Axes
+    plot.xlabel(r"$x$", fontsize = fontsize)
+    plot.ylabel(r"$z$", fontsize = fontsize)
+
+    title2 = r"$t = %d$ $\mathrm{orbits}}$" % (frame)
+    plot.title("%s" % (title2), y = 1.015, fontsize = fontsize + 1)
 
 	# Save, Show, and Close
     if version is None:
