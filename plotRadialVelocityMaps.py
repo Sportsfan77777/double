@@ -17,6 +17,8 @@ matplotlib.use('Agg')
 from matplotlib import rcParams as rc
 from matplotlib import pyplot as plot
 
+import util
+
 #from colormaps import cmaps
 #for key in cmaps:
 #    plot.register_cmap(name = key, cmap = cmaps[key])
