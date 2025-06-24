@@ -293,7 +293,9 @@ def make_plot(show = False):
     result = ax.pcolormesh(x, y, growth_rates, cmap = cmap)
 
     max_growth = np.max(growth_rates)
-    max_growth_two = np.max(growth_rates[:,len(kzs)/2:])
+
+    cutoff = np.searchsorted(y, 1.75)
+    max_growth_two = np.max(growth_rates[cutoff:])
     print max_growth
     print max_growth_two
 
@@ -324,7 +326,9 @@ def make_plot(show = False):
     plot.text(x_text, y_text, "Max growth: %.5f" % max_growth, fontsize = fontsize - 2)
 
     if log_axes:
-        plot.text(x_text, y_text * y_line, "Max growth (kz > 1.5): %.5f" % max_growth_two, fontsize = fontsize - 2)
+        plot.text(x_text, y_text * y_line, "Max growth ($k_\mathrm{z} > 1.75$): %.5f" % max_growth_two, fontsize = fontsize - 2)
+        plot.text(x_text, y_text * np.power(y_line, 2), "$q = %.1e$,  $\Lambda = %.1e$" % (q, big_lambda), fontsize = fontsize - 2)
+
 
     # Save, Show, and Close
     log_q = np.log10(q) + 10
