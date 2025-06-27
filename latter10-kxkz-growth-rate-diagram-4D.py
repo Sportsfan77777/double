@@ -25,22 +25,23 @@ mu0 = 1.0
 cs = Hg * Omega0
 cs2 = cs * cs
 
+
+#ten_q = 0.5
+#vertical_shear_q = 0.0 #-ten_q / 10.0 # Hg
+
+
+beta = 1.0e5 # 1.0e5 # Plasma beta parameter for (inverse) vertical field strength
+#va2 = 2.0 * cs2 / beta # Alfven velocity squared
+alfven_velocity_squared = 2.0 * cs2 / beta # Alfven velocity squared
+
 # Secondary parameters
 logReynolds = 7
 Reynolds = np.power(10, logReynolds) # Reynolds number for setting viscosity / diffusion
-
-ten_q = 0.5
-vertical_shear_q = 0.0 #-ten_q / 10.0 # Hg
 
 nu = Omega0 * Hg**2 / Reynolds # Viscosity and diffusion coefficient
 nuM = nu
 pert_amp = 1.0e-6
 
-# Variable parameters
-roberts_q = 1.0e-5
-q = roberts_q # 1.0e-6 # Roberts q
-
-big_lambda = 1e8 # 1.0e16 or 1.0
 N_squared = -0.1 #-0.1 # or 0.0
 
 # Problem parameters
@@ -48,26 +49,36 @@ kappa_squared = 1.0
 omega_squared = 1.0
 omega_power = -1.5
 omega_squared_power = -3.0
-eta = 2.34e12
-xi = roberts_q * eta
-
-beta = 1.0e5 # Plasma beta parameter for (inverse) vertical field strength
-#va2 = 2.0 * cs2 / beta # Alfven velocity squared
-alfven_velocity_squared = 2.0 * cs2 / beta # Alfven velocity squared
-eta = alfven_velocity_squared / big_lambda
-xi = roberts_q * eta
-
-#alfven_velocity_squared = big_lambda * eta
 
 class OneFluidMatrices:
-    def __init__(self, kx, kz):
-        self.kx = kx
-        self.kz = kz
+    def __init__(self, kx, kz, roberts_q = 1e-5, big_lambda = 1.0):
+      self.kx = kx
+      self.kz = kz
+
+      self.q = roberts_q
+      self.big_lambda = big_lambda
+
+      # Variable parameters
+      #roberts_q = 1.0e-5
+      #q = roberts_q # 1.0e-6 # Roberts q
+
+      #big_lambda = 1e8 # 1.0e16 or 1.0
+
+      #eta = 2.34e12
+      #xi = roberts_q * eta
+
+      self.eta = alfven_velocity_squared / big_lambda
+      self.xi = roberts_q * self.eta
+
+      #alfven_velocity_squared = big_lambda * eta
 
     def Latter2010(self):
         kx = self.kx; kz = self.kz
         ikx = 1j * kx; ikz = 1j * kz
         ksq = self.kx**2 + self.kz**2
+
+        q = self.q; big_lambda = self.big_lambda
+        eta = self.eta; xi = self.xi
 
         matrix_a = np.zeros((5, 5), dtype = np.cdouble)
         matrix_b = np.diag([1,1,1,1,1])
@@ -88,6 +99,9 @@ class OneFluidMatrices:
         ikx = 1j * kx; ikz = 1j * kz
         ksq = self.kx**2 + self.kz**2
 
+        q = self.q; big_lambda = self.big_lambda
+        eta = self.eta; xi = self.xi
+
         matrix_a = np.zeros((5, 5), dtype = np.cdouble)
         matrix_b = np.diag([1,1,1,1,1])
 
@@ -106,6 +120,9 @@ class OneFluidMatrices:
         kx = self.kx; kz = self.kz
         ikx = 1j * kx; ikz = 1j * kz
         ksq = self.kx**2 + self.kz**2
+
+        q = self.q; big_lambda = self.big_lambda
+        eta = self.eta; xi = self.xi
 
         matrix_a = np.zeros((8, 8), dtype = np.cdouble)
         matrix_b = np.diag([0,1,1,1,1,1,1,1])
@@ -132,6 +149,9 @@ class OneFluidMatrices:
         ikx = 1j * kx; ikz = 1j * kz
         ksq = self.kx**2 + self.kz**2
 
+        q = self.q; big_lambda = self.big_lambda
+        eta = self.eta; xi = self.xi
+
         matrix_a = np.zeros((8, 8), dtype = np.cdouble)
         matrix_b = np.diag([0,1,1,1,1,1,1,1])
 
@@ -156,6 +176,8 @@ class OneFluidMatrices:
         kx = self.kx; kz = self.kz
         ikx = 1j * kx; ikz = 1j * kz
         ksq = self.kx**2 + self.kz**2
+
+        eta = self.eta; xi = self.xi
 
         matrix_a = np.zeros((5, 5), dtype = np.cdouble)
         matrix_b = np.diag([0,1,1,1,1])
@@ -182,6 +204,8 @@ class OneFluidMatrices:
         ikx = 1j * kx; ikz = 1j * kz
         ksq = self.kx**2 + self.kz**2
 
+        eta = self.eta; xi = self.xi
+
         matrix_a = np.zeros((3, 3), dtype = np.cdouble)
         matrix_b = np.diag([1,1,1])
 
@@ -200,8 +224,8 @@ class OneFluidMatrices:
 
         return (matrix_a, matrix_b)
 
-def OneFluidEigen(kx, kz):
-    matrix = OneFluidMatrices(kx, kz)
+def OneFluidEigen(kx, kz, roberts_q = 1e-5, big_lambda = 1.0):
+    matrix = OneFluidMatrices(kx, kz, roberts_q = roberts_q, big_lambda = big_lambda)
     a, b = matrix.Latter2010xz_v0()
 
     try:
@@ -233,8 +257,8 @@ def OneFluidEigen(kx, kz):
 
 ### HELPER FUNCTIONS ###
 
-def get_growth_rate(kx, kz):
-    growth, eigenvector = OneFluidEigen(kx, kz)
+def get_growth_rate(kx, kz, roberts_q = 1e-5, big_lambda = 1.0):
+    growth, eigenvector = OneFluidEigen(kx, kz, roberts_q = roberts_q, big_lambda = big_lambda)
     #print "Growth: ", growth
     #print "Eigenvector: ", eigenvector
 
@@ -249,14 +273,17 @@ dpi = 100
 cmap = "seismic_r"
 
 version = None
-version = 46
+version = 600
 save_directory = "."
 
 log_axes = True
 
-def make_plot(show = False):
+def make_plot(plot_i = -1, roberts_q = 1.0e-7, big_lambda = 1.0, show = False):
     fig = plot.figure(figsize = (7, 6), dpi = dpi)
     ax = fig.add_subplot(111)
+
+    eta = alfven_velocity_squared / big_lambda
+    xi = roberts_q * eta
 
     # Data
     num_ks = 200
@@ -269,14 +296,14 @@ def make_plot(show = False):
     #kzs = np.linspace(1, 1e5, num_ks)
 
     if log_axes:
-        kxs = np.logspace(-2, 2, num_ks) / np.sqrt(alfven_velocity_squared)
-        kzs = np.logspace(-2, 2, num_ks) / np.sqrt(alfven_velocity_squared)
+        kxs = np.logspace(-4, 4, num_ks) / np.sqrt(alfven_velocity_squared)
+        kzs = np.logspace(-4, 4, num_ks) / np.sqrt(alfven_velocity_squared)
 
     growth_rates = np.zeros((len(kxs), len(kzs)))
 
     for i, kx_i in enumerate(kxs):
         for j, kz_j in enumerate(kzs):
-            growth, eigenvector = get_growth_rate(kx_i, kz_j)
+            growth, eigenvector = get_growth_rate(kx_i, kz_j, roberts_q = roberts_q, big_lambda = big_lambda)
             growth_rates[i, j] = growth
 
             if kx_i == kxs[10] and kz_j == kzs[150]:
@@ -295,7 +322,9 @@ def make_plot(show = False):
     max_growth = np.max(growth_rates)
 
     cutoff = np.searchsorted(y, 1.75)
-    max_growth_two = np.max(growth_rates[cutoff:])
+    #cutoff = np.searchsorted(y, 1.75)
+    #max_growth_two = np.max(growth_rates[cutoff:])
+    max_growth_two = np.max(growth_rates[len(x)/2:])
     print max_growth
     print max_growth_two
 
@@ -322,22 +351,27 @@ def make_plot(show = False):
 
     x_text = 0.04 * max(x); y_text = 0.92 * max(x)
     if log_axes:
-        x_text = 1.4 * min(x); y_text = 0.65 * max(x); y_line = 0.6
+        #x_text = 1.4 * min(x); y_text = 0.65 * max(x); y_line = 0.6
+        x_text = 1.4 * min(x); y_text = 0.4 * max(x); y_line = 0.36
     plot.text(x_text, y_text, "Max growth: %.5f" % max_growth, fontsize = fontsize - 2)
 
     if log_axes:
         plot.text(x_text, y_text * y_line, "Max growth ($k_\mathrm{z} > 1.75$): %.5f" % max_growth_two, fontsize = fontsize - 2)
-        plot.text(x_text, y_text * np.power(y_line, 2), "$q = %.1e$,  $\Lambda = %.1e$" % (q, big_lambda), fontsize = fontsize - 2)
+        plot.text(x_text, y_text * np.power(y_line, 2), r"$q = %.1e$,  $\Lambda = %.1e$" % (roberts_q, big_lambda), fontsize = fontsize - 2)
+        plot.text(x_text, y_text * np.power(y_line, 3), r"$\beta = %.1e$,  $Re = %.1e$" % (beta, Reynolds), fontsize = fontsize - 2)
+        plot.text(x_text, y_text * np.power(y_line, 4), r"$\eta = %.1e$,  $\xi = %.1e$" % (eta, xi), fontsize = fontsize - 2)
 
 
     # Save, Show, and Close
-    log_q = np.log10(q) + 10
+    log_q = np.log10(roberts_q) + 10
     log_big_lambda = np.log10(big_lambda) + 2
 
     if version is None:
-        save_fn = "%s/latter10xz-v0-growth-rate-diagram-q%d-bigLambda%d-Re%d.png" % (save_directory, log_q, log_big_lambda, logReynolds)
+        #save_fn = "%s/latter10xz-v0-growth-rate-diagram-q%d-bigLambda%d-Re%d.png" % (save_directory, log_q, log_big_lambda, logReynolds)
+        save_fn = "%s/latter10xz-v0-growth-rate-diagram-q%d-bigLambda%d-Re%d-plot%d.png" % (save_directory, logReynolds, plot_i)
     else:
-        save_fn = "%s/v%04d_latter10xz-v0-growth-rate-diagram-q%d-bigLambda%d-Re%d.png" % (save_directory, version, log_q, log_big_lambda, logReynolds)
+        #save_fn = "%s/v%04d_latter10xz-v0-growth-rate-diagram-q%d-bigLambda%d-Re%d.png" % (save_directory, version, log_q, log_big_lambda, logReynolds)
+        save_fn = "%s/v%04d_latter10xz-v0-growth-rate-diagram-q-bigLambda-Re%d-plot%d.png" % (save_directory, version, logReynolds, plot_i)
     plot.savefig(save_fn, bbox_inches = 'tight', dpi = dpi)
 
     if show:
@@ -348,14 +382,24 @@ def make_plot(show = False):
 
 make_plot(show = True)
 
-"""
 def make_plots():
-    num_hall = 50 # really half of num_hall
-    hall_effects = np.concatenate( (-1.0 * np.logspace(-4, np.log10(2), num_hall)[::-1], [0], np.logspace(-4, np.log10(2), num_hall)) )
-    hall_effects = np.linspace(-2, 2, 2 * num_hall + 1)
-    #hall_effects = np.array([-2, 0, 2])
-    for hall_effect_i, hall_effect in enumerate(hall_effects):
-        print "HALL EFFECTS:", hall_effect_i, hall_effect
-        make_plot(hall_i = hall_effect_i, hall_effect = hall_effect)
-"""
+    num_q = 11
+    roberts_qs = np.logspace(-10, -5, num_q)
 
+    num_lambda = 15
+    big_lambdas = np.logspace(-5, 2, num_lambda)
+
+    print roberts_qs
+    print big_lambdas
+
+    combinations = np.meshgrid(roberts_qs, big_lambdas)
+    #print combinations
+
+    for i, roberts_q_i in enumerate(roberts_qs):
+       for j, big_lambda_i in enumerate(big_lambdas):
+          k = i * len(big_lambdas) + j
+          #roberts_q_i, big_lambda_i = combination_i
+          print "Combination:", i, roberts_q_i, big_lambda_i
+          make_plot(plot_i = k, roberts_q = roberts_q_i, big_lambda = big_lambda_i)
+
+#make_plots()
