@@ -2,6 +2,10 @@
 Plot growth rates as function of kx and kz
 """
 
+import sys, os, subprocess
+import itertools
+from multiprocessing import Pool
+
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plot
@@ -30,12 +34,12 @@ cs2 = cs * cs
 #vertical_shear_q = 0.0 #-ten_q / 10.0 # Hg
 
 
-beta = 1.0e5 # 1.0e5 # Plasma beta parameter for (inverse) vertical field strength
+beta = 1.0e4 # 1.0e5 # Plasma beta parameter for (inverse) vertical field strength
 #va2 = 2.0 * cs2 / beta # Alfven velocity squared
 alfven_velocity_squared = 2.0 * cs2 / beta # Alfven velocity squared
 
 # Secondary parameters
-logReynolds = 7
+logReynolds = 5
 Reynolds = np.power(10, logReynolds) # Reynolds number for setting viscosity / diffusion
 
 nu = Omega0 * Hg**2 / Reynolds # Viscosity and diffusion coefficient
@@ -273,10 +277,17 @@ dpi = 100
 cmap = "seismic_r"
 
 version = None
-version = 600
-save_directory = "."
+version = 903
+save_directory = "v%04d-latter10xz-v0-growth-rate-diagrams" % version
+
+if not os.path.isdir(save_directory):
+    os.mkdir(save_directory) # make save directory if it does not already exist
 
 log_axes = True
+
+def make_plot_helper(args):
+    (plot_i, roberts_q, big_lambda) = args
+    make_plot(plot_i = plot_i, roberts_q = roberts_q, big_lambda = big_lambda)
 
 def make_plot(plot_i = -1, roberts_q = 1.0e-7, big_lambda = 1.0, show = False):
     fig = plot.figure(figsize = (7, 6), dpi = dpi)
@@ -380,26 +391,46 @@ def make_plot(plot_i = -1, roberts_q = 1.0e-7, big_lambda = 1.0, show = False):
     plot.close(fig) # Close Figure (to avoid too many figures)
 
 
-make_plot(show = True)
+#make_plot(show = True)
 
-def make_plots():
-    num_q = 11
-    roberts_qs = np.logspace(-10, -5, num_q)
+def make_plots(num_cores = 1):
+    num_q = 21
+    roberts_qs = np.logspace(-10, 0, num_q)
 
-    num_lambda = 15
-    big_lambdas = np.logspace(-5, 2, num_lambda)
+    num_lambda = 17
+    big_lambdas = np.logspace(-6, 2, num_lambda)
 
     print roberts_qs
     print big_lambdas
 
-    combinations = np.meshgrid(roberts_qs, big_lambdas)
-    #print combinations
+    #combinations = np.meshgrid(roberts_qs, big_lambdas)
+    combinations = list(itertools.product(roberts_qs, big_lambdas))
+    print combinations
 
+    numbered_combinations = [(i, roberts_q_i, big_lambda_i) for i, (roberts_q_i, big_lambda_i) in enumerate(combinations)]
+
+    """
     for i, roberts_q_i in enumerate(roberts_qs):
        for j, big_lambda_i in enumerate(big_lambdas):
           k = i * len(big_lambdas) + j
           #roberts_q_i, big_lambda_i = combination_i
           print "Combination:", i, roberts_q_i, big_lambda_i
           make_plot(plot_i = k, roberts_q = roberts_q_i, big_lambda = big_lambda_i)
+    """
+    if len(numbered_combinations) == 1:
+      make_plot_helper(numbered_combinations[0], show = True)
+    else:
+      if num_cores > 1:
+          p = Pool(num_cores) # default number of processes is multiprocessing.cpu_count()
+          p.map(make_plot_helper, numbered_combinations)
+          p.terminate()
+      else:
+        for i, roberts_q_i in enumerate(roberts_qs):
+           for j, big_lambda_i in enumerate(big_lambdas):
+              k = i * len(big_lambdas) + j
+              #roberts_q_i, big_lambda_i = combination_i
+              print "Combination:", i, roberts_q_i, big_lambda_i
+              make_plot(plot_i = k, roberts_q = roberts_q_i, big_lambda = big_lambda_i)
 
-#make_plots()
+num_cores = 64
+make_plots(num_cores = num_cores)
