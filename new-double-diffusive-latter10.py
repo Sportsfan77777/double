@@ -6,6 +6,7 @@ which is bad because the modifications were not fully tested.
 
 import numpy as np
 import matplotlib.pyplot as plot
+import argparse
 
 import scipy
 from scipy.linalg import eigvals
@@ -17,7 +18,17 @@ import dedalus.public as d3
 import logging
 logger0 = logging.getLogger(__name__)
 
-restart = None
+'''
+For restarting
+'''
+parser = argparse.ArgumentParser()
+parser.add_argument("--restart", nargs='*', help="give checkpoint number")
+args = parser.parse_args()
+if(args.restart):
+    restart = args.restart[0]
+else:
+    restart = None
+import os, shutil
 
 # Units
 Omega0 = 1.0
@@ -77,8 +88,8 @@ xi = q * eta
 # Grid
 pert_amp = 1e-5 # perturbation amplitude (in units of dvgy / cs)
 
-kx_pert = 0.1 / np.sqrt(alfven_velocity_squared)
-kz_pert = 0.6 / np.sqrt(alfven_velocity_squared)
+kx_pert = 1.0 / np.sqrt(alfven_velocity_squared)
+kz_pert = 1.0 / np.sqrt(alfven_velocity_squared)
 
 print("kx = %.f, kz = %.f" % (kx_pert, kz_pert))
 print("Bz0 = %.f" % Bz0)
@@ -98,7 +109,7 @@ else:
     Lx, Ly, Lz = Lbox, Lbox, Lbox
     low_pass_scales = 0.25
 
-Nx, Ny, Nz = 64, 1, 64
+Nx, Ny, Nz = 128, 1, 128
 #Nx, Ny, Nz = 64, 2, 64
 #Nx, Ny, Nz = 256, 2, 256
 #Nx, Ny, Nz = 1024, 2, 1024
@@ -112,7 +123,7 @@ else:
 # Time integration and output cadence
 timestepper = d3.RK443 # RK443 or RK222
 cfl_number = 0.1 # 0.2
-min_timestep = 1e-2 / Omega0
+min_timestep = 1e-4 / Omega0
 max_timestep = 1e-2 / Omega0
 
 period = 2.0 * np.pi
@@ -122,7 +133,7 @@ stop_sim_time *= period
 snapshot_dt = 1.0 * period
 analysis_dt = 0.2 * period
 
-checkpoint_dt = 10.0 * period
+checkpoint_dt = 1.0 * period
 
 OutputRes = 256
 OutputScale = OutputRes / Nx
@@ -166,7 +177,7 @@ tau_phi = dist.Field(name = 'tau_phi') # why no bases here?
 
 ### Coordinate axes and unit vectors ###
 
-z, x = dist.local_grids(x_basis, z_basis)
+z, x = dist.local_grids(z_basis, x_basis)
 ez, ex, ey = coords.unit_vector_fields(dist)
 
 ### Substitutions for convenience ###
@@ -222,7 +233,7 @@ alfven_velocity = Bxz / np.sqrt(mu0 * rhog0)
 
 # Problem
 problem = d3.IVP([u, theta, p, tau_P, A, phi, tau_phi], namespace=locals())
-problem.add_equation("dt(u) + grad(p) / rhog0 - 2 * Omega0 * uy * ex + N_squared * theta * ex - nu*lap(u) = B@grad(DB)/(mu0*rhog0) -u@grad(u)")
+problem.add_equation("dt(u) + grad(p) / rhog0 - 2 * Omega0 * uy * ex + Omega0 * (0.5 * ux - vertical_shear_q * uz) * ey + N_squared * theta * ex - nu*lap(u) = B@grad(DB)/(mu0*rhog0) -u@grad(u)")
 #problem.add_equation("dt(u) + grad(p) / rhog0 - 2 * Omega0 * uy * ex + N_squared * theta * ex - nu*lap(u) = Bxz@grad(DBxz)/(mu0*rhog0) -u@grad(u)")
 #problem.add_equation("dt(uy) + Omega0 * (0.5 * ux - vertical_shear_q * uz) - nu*lap(uy) = Bxz@grad(DBy)/(mu0*rhog0) -u@grad(uy)")
 
@@ -405,7 +416,7 @@ class OneFluidMatrices:
 
 def OneFluidEigen(kx, kz):
     matrix = OneFluidMatrices(kx, kz)
-    a, b = matrix.Latter2010xz()
+    a, b = matrix.Latter2010xz_v0()
 
     eigenvalues, eigenvectors = scipy.linalg.eig(a, b)
 
@@ -435,9 +446,9 @@ if pert == 'eigen':
     expik = np.cos(kx_pert * x + kz_pert * z) + 1j * np.sin(kx_pert * x + kz_pert * z)
 
     dp  = eigenvector[0]*rhog0
-    dux = eigenvector[1] * np.sqrt(alfven_velocity_squared)
-    duy = eigenvector[2] * np.sqrt(alfven_velocity_squared)
-    duz = eigenvector[3] * np.sqrt(alfven_velocity_squared)
+    dux = eigenvector[1] #* np.sqrt(alfven_velocity_squared)
+    duy = eigenvector[2] #* np.sqrt(alfven_velocity_squared)
+    duz = eigenvector[3] #* np.sqrt(alfven_velocity_squared)
     dBx = eigenvector[4] * Bz0
     dBy = eigenvector[5] * Bz0
     dBz = eigenvector[6] * Bz0
@@ -484,6 +495,10 @@ snapshots.add_task(p, name = 'p', scales = OutputScale)
 snapshots.add_task(Bxz@ex, name = 'Bx', scales = OutputScale)
 snapshots.add_task(By, name = 'By', scales = OutputScale)
 snapshots.add_task(Bxz@ez, name = 'Bz', scales = OutputScale)
+
+# Restart files
+checkpoints = solver.evaluator.add_file_handler('checkpoints', sim_dt=checkpoint_dt, max_writes=1, mode=file_handler_mode)
+checkpoints.add_tasks(solver.state)
 
 # Flow properties
 flow = d3.GlobalFlowProperty(solver, cadence=10)
