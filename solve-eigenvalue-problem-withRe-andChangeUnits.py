@@ -123,7 +123,7 @@ fontsize = 18
 labelsize = 16
 
 def make_plot(version = None, big_lambda = 1.0, show = False):
-    #plot.figure()
+    fig = plot.figure()
 
     # Data
     roberts_qs = np.logspace(-10, 0, 11)
@@ -163,6 +163,8 @@ def make_plot(version = None, big_lambda = 1.0, show = False):
 
     if show:
        plot.show()
+
+    plot.close(fig)
 
 
 #make_plot(show = False)
