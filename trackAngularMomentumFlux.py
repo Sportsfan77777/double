@@ -11,6 +11,9 @@ import matplotlib
 matplotlib.use('Agg')
 from matplotlib import pyplot as plot
 
+import h5py
+import util
+
 ###############################################################################
 
 ### Input Parameters ###
