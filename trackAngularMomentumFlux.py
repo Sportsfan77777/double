@@ -21,6 +21,8 @@ def new_argument_parser(description = "Plot gas density maps."):
     # Frame Selection
     parser.add_argument('frames', type = int, nargs = '+',
                          help = 'select single frame or range(start, end, rate). error if nargs != 1 or 3')
+    parser.add_argument('-c', dest = "num_cores", type = int, default = 1,
+                         help = 'number of cores (default: 1)')
 
     return parser
 
@@ -50,6 +52,7 @@ def get_flux(args):
     flux_over_time[i] = flux
 
 frame_range = util.get_frame_range(args.frames)
+num_cores = args.num_cores
 
 flux_over_time = mp_array("d", len(frame_range))
 pool_args = [(i, frame) for i, frame in enumerate(frame_range)]
