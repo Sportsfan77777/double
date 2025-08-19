@@ -99,9 +99,9 @@ plot.figure()
 
 x = frame_range
 y = np.array(energy_over_time)
-y2 = np.array(ux_over_time)
-y3 = np.array(uy_over_time)
-y4 = np.array(uz_over_time)
+y2 = np.array(ux_squared_over_time)
+y3 = np.array(uy_squared_over_time)
+y4 = np.array(uz_squared_over_time)
 plot.plot(x, y, c = "b", linewidth = linewidth, label = r"$|u|^2$")
 plot.plot(x, y2, c = "r", linewidth = linewidth, label = r"$u_\mathrm{x}^2$")
 plot.plot(x, y3, c = "r", linewidth = linewidth, label = r"$u_\mathrm{y}^2$")
