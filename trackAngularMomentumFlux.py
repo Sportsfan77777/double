@@ -52,7 +52,10 @@ def get_flux(args):
     vy_data    = output['tasks']["uy"]
 
     vx_times_vy = np.multiply(vx_data, vy_data)
-    flux = np.average(vx_times_vy, axis=(0,-1))
+
+    flux = np.average(vx_times_vy, axis = 0)
+    flux = np.average(flux, axis = 0)
+    flux = np.average(flux, axis = 0)
     
     flux_over_time[i] = flux
 
@@ -86,12 +89,12 @@ plot.figure()
 x = frame_range
 y = np.array(flux_over_time)
 y2 = -1.0 * y
-plot.plot(x, y, c = "b", linewidth = linewidth)
-plot.plot(x, y2, c = "r", linewidth = linewidth)
+plot.plot(x, y, c = "b", linewidth = linewidth, label = "+")
+plot.plot(x, y2, c = "r", linewidth = linewidth, label = "-")
+
+plot.legend(loc = "upper left")
 
 #plot.plot(x[:-1], y3, linewidth = linewidth)
-
-print(max(y3))
 
 #print(len(x), len(y))
 
@@ -102,7 +105,7 @@ plot.ylim(10**-8, 1.0)
 plot.yscale('log')
 
 plot.xlabel('t', fontsize = fontsize)
-plot.ylabel(r'max($<v_\mathrm{x} v_\mathrm{y}>$)', fontsize = fontsize)
+plot.ylabel(r'$<v_\mathrm{x} v_\mathrm{y}>$', fontsize = fontsize)
 plot.title('Angular Momentum Flux', fontsize = fontsize + 1)
 
 cwd = os.getcwd().split("/")[-1]
