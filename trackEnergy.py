@@ -102,10 +102,10 @@ y = np.array(energy_over_time)
 y2 = np.array(ux_squared_over_time)
 y3 = np.array(uy_squared_over_time)
 y4 = np.array(uz_squared_over_time)
-plot.plot(x, y, c = "b", linewidth = linewidth, label = r"$|u|^2$")
-plot.plot(x, y2, c = "r", linewidth = linewidth, label = r"$u_\mathrm{x}^2$")
+plot.plot(x, y, c = "k", linewidth = linewidth, label = r"$|u|^2$")
+plot.plot(x, y2, c = "b", linewidth = linewidth, label = r"$u_\mathrm{x}^2$")
 plot.plot(x, y3, c = "r", linewidth = linewidth, label = r"$u_\mathrm{y}^2$")
-plot.plot(x, y4, c = "r", linewidth = linewidth, label = r"$u_\mathrm{z}^2$")
+plot.plot(x, y4, c = "g", linewidth = linewidth, label = r"$u_\mathrm{z}^2$")
 
 plot.legend(loc = "upper left")
 
@@ -121,7 +121,7 @@ plot.yscale('log')
 
 plot.xlabel('t', fontsize = fontsize)
 plot.ylabel(r'$<v^2>$', fontsize = fontsize)
-plot.title('Angular Momentum Flux', fontsize = fontsize + 1)
+plot.title('Energy', fontsize = fontsize + 1)
 
 cwd = os.getcwd().split("/")[-1]
 plot.savefig("energy-%s.png" % cwd, bbox_inches = 'tight')
