@@ -44,6 +44,8 @@ smooth = lambda array, kernel_size : ff.gaussian_filter(array, kernel_size)
 def get_flux(args):
     i, frame = args
 
+    period = 2.0 * np.pi
+
     output  = h5py.File("snapshots/snapshots_s%d.h5" % frame, mode = 'r')
     times    = output['scales']['sim_time'][:] / period
     vx_data    = output['tasks']["ux"]
