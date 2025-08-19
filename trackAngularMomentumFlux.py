@@ -22,6 +22,8 @@ def new_argument_parser(description = "Plot gas density maps."):
     parser.add_argument('frames', type = int, nargs = '+',
                          help = 'select single frame or range(start, end, rate). error if nargs != 1 or 3')
 
+    return parser
+
 ### Parse Arguments ###
 args = new_argument_parser().parse_args()
 
