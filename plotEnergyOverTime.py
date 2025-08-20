@@ -22,10 +22,10 @@ fontsize = 16
 plot.figure()
 
 x = analysis[:, 0] / (2.0 * np.pi)
-y = analysis[:, 2] # u^2
-y2 = analysis[:, 3] # ux^2
-y3 = analysis[:, 4] # uy^2
-y4 = analysis[:, 5] # uz^2
+y = np.power(analysis[:, 2], 2) # u^2
+y2 = np.power(analysis[:, 3], 2) # ux^2
+y3 = np.power(analysis[:, 4], 2) # uy^2
+y4 = np.power(analysis[:, 5], 2) # uz^2
 
 #print min(y3), max(y3)
 
