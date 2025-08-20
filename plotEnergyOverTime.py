@@ -30,8 +30,8 @@ y4 = analysis[:, 5] # uz^2
 #print min(y3), max(y3)
 
 plot.plot(x, y, linewidth = linewidth, c = 'k', label = r"$|u|^2$")
-plot.plot(x, y2, linewidth = linewidth, c = 'b', label = r"$u_\mathrm{z}^2$")
-plot.plot(x, y3, linewidth = linewidth, c = 'r', label = r"$u_\mathrm{z}^2$")
+plot.plot(x, y2, linewidth = linewidth, c = 'b', label = r"$u_\mathrm{x}^2$")
+plot.plot(x, y3, linewidth = linewidth, c = 'r', label = r"$u_\mathrm{y}^2$")
 plot.plot(x, y4, linewidth = linewidth, c = 'g', label = r"$u_\mathrm{z}^2$")
 
 plot.legend(loc = "upper left")
