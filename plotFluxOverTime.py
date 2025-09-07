@@ -50,7 +50,7 @@ plot.legend(loc = "upper left")
 
 plot.xlim(x[0], x[-1])
 #plot.ylim(0, max(y))
-plot.ylim(10**-8, 1.0)
+plot.ylim(1.0e-10, 1.0e-4)
 
 plot.yscale('log')
 
