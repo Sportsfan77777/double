@@ -112,5 +112,3 @@ def make_plot(show = False):
         plot.show()
 
     plot.close(fig) # Close Figure (to avoid too many figures)
-
-plot.savefig("pressure-over-time-%s.png" % cwd, bbox_inches = 'tight')
