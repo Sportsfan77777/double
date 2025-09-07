@@ -82,6 +82,9 @@ save_directory = "."
 def make_plot(show = False):
     plot.figure()
 
+    output  = h5py.File("snapshots/snapshots_s1.h5", mode = 'r')
+    times    = output['scales']['sim_time'][:] / period
+    p_data    = output['tasks']["p"]
     xs   = p_data.dims[1][0][:]
     zs   = p_data.dims[2][0][:]
 
