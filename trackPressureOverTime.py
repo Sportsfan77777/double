@@ -52,6 +52,8 @@ def get_pressure(args):
     p_data    = output['tasks']["p"]
 
     p_averaged = np.average(p_data, axis = -1)
+
+    print(np.shape(p_averaged))
     
     start = i * num_x
     end = start + num_x
