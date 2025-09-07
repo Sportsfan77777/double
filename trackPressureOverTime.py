@@ -32,16 +32,15 @@ def new_argument_parser(description = "Plot gas density maps."):
 ### Parse Arguments ###
 args = new_argument_parser().parse_args()
 
+### Get Input Parameters ###
+
+# Frames
+frame_range = util.get_frame_range(args.frames)
+
+# Number of Cores 
+num_cores = args.num_cores
+
 num_x = 256
-
-with open('analysis.txt', 'r') as f:
-   reader = csv.reader(f)
-   data = list(reader)
-   analysis = np.array(data, dtype = 'float')
-
-#print np.shape(analysis)
-
-smooth = lambda array, kernel_size : ff.gaussian_filter(array, kernel_size)
 
 def get_energy(args):
     i, frame = args
