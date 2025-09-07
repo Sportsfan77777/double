@@ -42,7 +42,7 @@ num_cores = args.num_cores
 
 num_x = 256
 
-def get_energy(args):
+def get_pressure(args):
     i, frame = args
 
     period = 2.0 * np.pi
