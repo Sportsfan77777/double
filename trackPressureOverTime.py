@@ -53,7 +53,7 @@ def get_pressure(args):
 
     p_averaged = np.average(p_data[0][0], axis = -1)
 
-    print(np.shape(p_averaged))
+    #print(np.shape(p_averaged))
     
     start = i * num_x
     end = start + num_x
@@ -78,6 +78,11 @@ linewidth = 3
 fontsize = 16
 
 save_directory = "."
+version = None
+dpi = 100
+
+#cmap = "inferno"
+cmap = "seismic"
 
 def make_plot(show = False):
     fig = plot.figure()
@@ -89,14 +94,24 @@ def make_plot(show = False):
     xs   = p_data.dims[1][0][:]
     zs   = p_data.dims[2][0][:]
 
-    x = frame_range
-    y = xs
+    x = np.array(frame_range) - 1
+    y = zs
+
+    #print(np.shape(x), np.shape(y), np.shape(pressure_field))
+
     result = ax.pcolormesh(x, y, np.transpose(pressure_field), cmap = cmap)
+    #result = ax.pcolormesh(x, y, pressure_field, cmap = cmap)
+
+    max_color = np.max(np.abs(pressure_field))
 
     cbar = fig.colorbar(result)
-    result.set_clim(clim[0], clim[1])
+    #result.set_clim(clim[0], clim[1])
+    result.set_clim(-max_color, max_color)
 
     # Axes
+    plot.xlim(x[0], x[-1])
+    plot.ylim(y[0], y[-1])
+
     plot.xlabel(r"$t$", fontsize = fontsize)
     plot.ylabel(r"$x$", fontsize = fontsize)
 
