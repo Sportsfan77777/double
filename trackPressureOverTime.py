@@ -77,6 +77,8 @@ pressure_field = np.reshape(pressure_array, shape = (len(frame_range), num_x))
 linewidth = 3
 fontsize = 16
 
+save_directory = "."
+
 def make_plot(show = False):
     plot.figure()
 
@@ -112,3 +114,5 @@ def make_plot(show = False):
         plot.show()
 
     plot.close(fig) # Close Figure (to avoid too many figures)
+
+make_plot()
