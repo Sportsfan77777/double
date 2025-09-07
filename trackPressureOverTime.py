@@ -82,8 +82,8 @@ save_directory = "."
 def make_plot(show = False):
     plot.figure()
 
-    xs   = vx_data.dims[1][0][:]
-    zs   = vx_data.dims[2][0][:]
+    xs   = p_data.dims[1][0][:]
+    zs   = p_data.dims[2][0][:]
 
     x = frame_range
     y = xs
