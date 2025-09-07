@@ -80,7 +80,8 @@ fontsize = 16
 save_directory = "."
 
 def make_plot(show = False):
-    plot.figure()
+    fig = plot.figure()
+    ax = fig.add_subplot(111)
 
     output  = h5py.File("snapshots/snapshots_s1.h5", mode = 'r')
     times    = output['scales']['sim_time'][:]
