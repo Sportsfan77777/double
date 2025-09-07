@@ -51,7 +51,7 @@ def get_pressure(args):
     times    = output['scales']['sim_time'][:] / period
     p_data    = output['tasks']["p"]
 
-    p_averaged = np.average(p_data, axis = -1)
+    p_averaged = np.average(p_data[0][0], axis = -1)
 
     print(np.shape(p_averaged))
     
