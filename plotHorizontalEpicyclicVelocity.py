@@ -133,7 +133,7 @@ rc['ytick.labelsize'] = labelsize
 
 def make_plot(frame, show = False):
     # Set up figure
-    fig = plot.figure(figsize = (7, 6), dpi = dpi)
+    fig = plot.figure(figsize = (10, 5), dpi = dpi)
     ax = fig.add_subplot(111)
 
     # Read data
