@@ -159,12 +159,13 @@ def make_plot(frame, show = False):
     #data2D[i,:] = np.mean(vxXZ, axis = 1)
 
     velocity = np.sqrt(np.power(vxXZ, 2) + 4.0 * np.power(vyXZ, 2))
-    print(np.shape(vxXZ), np.shape(velocity))
+    #print(np.shape(vxXZ), np.shape(velocity))
 
     ### Plot ###
     x = xs
     y = zs
-    result = ax.pcolormesh(x, y, np.transpose(velocity), cmap = cmap)
+    result = ax.pcolormesh(x, y, velocity, cmap = cmap)
+    #result = ax.pcolormesh(x, y, np.transpose(velocity), cmap = cmap)
 
     cbar = fig.colorbar(result)
     result.set_clim(clim[0], clim[1])
