@@ -144,8 +144,8 @@ def make_plot(frame, show = False):
 
     output  = h5py.File("snapshots/snapshots_s%d.h5" % frame, mode = 'r')
     times    = output['scales']['sim_time'][:] / period
-    vx_data    = output['tasks']["vx"]
-    vx_data    = output['tasks']["vy"]    
+    vx_data    = output['tasks']["ux"]
+    vx_data    = output['tasks']["uy"]
 
     xs   = vx_data.dims[1][0][:]
     zs   = vx_data.dims[2][0][:]
