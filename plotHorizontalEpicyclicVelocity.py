@@ -158,7 +158,7 @@ def make_plot(frame, show = False):
     vyXZ      = vy3D[:,:]
     #data2D[i,:] = np.mean(vxXZ, axis = 1)
 
-    velocity = np.sqrt(np.power(vxXZ, 2) + 4.0 * np.power(vyYZ, 2))
+    velocity = np.sqrt(np.power(vxXZ, 2) + 4.0 * np.power(vyXZ, 2))
 
     ### Plot ###
     x = xs
