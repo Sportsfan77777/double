@@ -147,8 +147,8 @@ def make_plot(frame, show = False):
     vx_data    = output['tasks']["ux"]
     vy_data    = output['tasks']["uy"]
 
-    xs   = vx_data.dims[1][0][:]
-    zs   = vx_data.dims[2][0][:]
+    zs   = vx_data.dims[1][0][:]
+    xs   = vx_data.dims[2][0][:]
 
     #for m in range(0, snapshots_per_set):
     vx3D      = vx_data[0]
@@ -166,6 +166,7 @@ def make_plot(frame, show = False):
     y = zs
     result = ax.pcolormesh(x, y, velocity, cmap = cmap)
     #result = ax.pcolormesh(x, y, np.transpose(velocity), cmap = cmap)
+    ax.set_aspect(1.0)
 
     cbar = fig.colorbar(result)
     result.set_clim(clim[0], clim[1])
