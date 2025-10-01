@@ -153,7 +153,7 @@ def make_plot(frame, show = False):
     #for m in range(0, snapshots_per_set):
     Bx3D      = Bx_data[0]
     #times[i]    = time[0]
-    BxXZ      = vx3D[:,:,0]
+    BxXZ      = Bx3D[:,:,0]
     #data2D[i,:] = np.mean(BxXZ, axis = 1)
 
     magnetic_field = BxXZ
