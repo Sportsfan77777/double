@@ -142,7 +142,7 @@ def make_plot(frame, show = False):
 
     period = 2.0 * np.pi
 
-    beta = 1e-5
+    beta = 1e5
     Bz0 = np.sqrt(2.0 / beta)
 
     var = "Bz"
