@@ -161,7 +161,8 @@ def make_plot(frame, show = False):
     ### Plot ###
     x = xs
     y = zs
-    result = ax.pcolormesh(x, y, np.transpose(magnetic_field), cmap = cmap)
+    result = ax.pcolormesh(x, y, magnetic_field, cmap = cmap)
+    #result = ax.pcolormesh(x, y, np.transpose(magnetic_field), cmap = cmap)
 
     cbar = fig.colorbar(result)
     result.set_clim(clim[0], clim[1])
