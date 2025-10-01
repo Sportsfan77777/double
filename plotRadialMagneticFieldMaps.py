@@ -63,7 +63,7 @@ def new_argument_parser(description = "Plot gas density maps."):
                          help = 'separation between contours (choose this or num_levels) (default: 0.1)')
     
     # Plot Parameters (rarely need to change)
-    parser.add_argument('--cmap', dest = "cmap", default = "seismic",
+    parser.add_argument('--cmap', dest = "cmap", default = "PuOr_r",
                          help = 'color map (default: seismic)')
     parser.add_argument('--cmax', dest = "cmax", type = float, default = 0.0002,
                          help = 'maximum radial velocity in colorbar (default: 0.2)')
@@ -133,7 +133,7 @@ rc['ytick.labelsize'] = labelsize
 
 def make_plot(frame, show = False):
     # Set up figure
-    fig = plot.figure(figsize = (7, 6), dpi = dpi)
+    fig = plot.figure(figsize = (10, 5), dpi = dpi)
     ax = fig.add_subplot(111)
 
     # Read data
@@ -147,13 +147,13 @@ def make_plot(frame, show = False):
     times    = output['scales']['sim_time'][:] / period
     vx_data    = output['tasks'][var]
 
-    xs   = vx_data.dims[1][0][:]
-    zs   = vx_data.dims[2][0][:]
+    zs   = vx_data.dims[1][0][:]
+    xs   = vx_data.dims[2][0][:]
 
     #for m in range(0, snapshots_per_set):
     vx3D      = vx_data[0]
     #times[i]    = time[0]
-    vxXZ      = vx3D[:,:]
+    vxXZ      = vx3D[:,:,0]
     #data2D[i,:] = np.mean(vxXZ, axis = 1)
 
     velocity = vxXZ
