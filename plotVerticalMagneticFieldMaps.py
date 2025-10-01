@@ -143,7 +143,7 @@ def make_plot(frame, show = False):
     period = 2.0 * np.pi
 
     beta = 1e-5
-    Bz0 = 2.0 / beta
+    Bz0 = np.sqrt(2.0 / beta)
 
     var = "Bz"
     output  = h5py.File("snapshots/snapshots_s%d.h5" % frame, mode = 'r')
