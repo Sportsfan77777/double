@@ -63,7 +63,7 @@ def new_argument_parser(description = "Plot gas density maps."):
                          help = 'separation between contours (choose this or num_levels) (default: 0.1)')
     
     # Plot Parameters (rarely need to change)
-    parser.add_argument('--cmap', dest = "cmap", default = "PuOr_r",
+    parser.add_argument('--cmap', dest = "cmap", default = "RdBu_r",
                          help = 'color map (default: seismic)')
     parser.add_argument('--cmax', dest = "cmax", type = float, default = 0.00005,
                          help = 'maximum radial velocity in colorbar (default: 0.2)')
@@ -174,7 +174,7 @@ def make_plot(frame, show = False):
     title2 = r"$t = %d$ $\mathrm{orbits}$" % (frame)
     plot.title("%s" % (title2), y = 1.015, fontsize = fontsize + 1)
 
-    cbar.set_label(r"$v_\mathrm{x}$", fontsize = fontsize, rotation = 270, labelpad = 25)
+    cbar.set_label(r"$B_\mathrm{x}$", fontsize = fontsize, rotation = 270, labelpad = 25)
 
     # Save, Show, and Close
     if version is None:
