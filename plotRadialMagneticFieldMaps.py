@@ -145,23 +145,23 @@ def make_plot(frame, show = False):
     var = "Bx"
     output  = h5py.File("snapshots/snapshots_s%d.h5" % frame, mode = 'r')
     times    = output['scales']['sim_time'][:] / period
-    vx_data    = output['tasks'][var]
+    Bx_data    = output['tasks'][var]
 
-    zs   = vx_data.dims[1][0][:]
-    xs   = vx_data.dims[2][0][:]
+    zs   = Bx_data.dims[1][0][:]
+    xs   = Bx_data.dims[2][0][:]
 
     #for m in range(0, snapshots_per_set):
-    vx3D      = vx_data[0]
+    Bx3D      = Bx_data[0]
     #times[i]    = time[0]
-    vxXZ      = vx3D[:,:,0]
-    #data2D[i,:] = np.mean(vxXZ, axis = 1)
+    BxXZ      = vx3D[:,:,0]
+    #data2D[i,:] = np.mean(BxXZ, axis = 1)
 
-    velocity = vxXZ
+    magnetic_field = BxXZ
 
     ### Plot ###
     x = xs
     y = zs
-    result = ax.pcolormesh(x, y, np.transpose(velocity), cmap = cmap)
+    result = ax.pcolormesh(x, y, np.transpose(magnetic_field), cmap = cmap)
 
     cbar = fig.colorbar(result)
     result.set_clim(clim[0], clim[1])
