@@ -142,6 +142,9 @@ def make_plot(frame, show = False):
 
     period = 2.0 * np.pi
 
+    beta = 1e-5
+    Bz0 = 2.0 / beta
+
     var = "Bz"
     output  = h5py.File("snapshots/snapshots_s%d.h5" % frame, mode = 'r')
     times    = output['scales']['sim_time'][:] / period
@@ -156,7 +159,7 @@ def make_plot(frame, show = False):
     BxXZ      = Bx3D[:,:,0]
     #data2D[i,:] = np.mean(BxXZ, axis = 1)
 
-    magnetic_field = BxXZ
+    magnetic_field = BxXZ - Bz0
 
     ### Plot ###
     x = xs
