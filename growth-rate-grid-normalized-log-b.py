@@ -179,10 +179,8 @@ def make_plot(version = None, Reynolds_number = 1.0e8, show = False):
     beta2 = 5e3; mri_x2 = np.sqrt(2) * np.power(beta2, -0.5)
     beta3 = 1e3; mri_x3 = np.sqrt(2) * np.power(beta3, -0.5)
 
-    #if N_squared < -0.10:
     #plot.plot([mri_x1, mri_x1], [40.0 * min(y), max(y)], c = 'k', linestyle = "--", alpha = 0.6)
     plot.plot([mri_x2, mri_x2], [40.0 * min(y), max(y)], c = 'k', linestyle = "--", alpha = 0.6)
-    #plot.plot([mri_x2, mri_x2], [40.0 * min(y), max(y)], c = 'k', linestyle = "--", alpha = 0.6)
     plot.plot([mri_x3, mri_x3], [40.0 * min(y), max(y)], c = 'k', linestyle = "-")
 
     plot.xlim(min(x), max(x))
@@ -204,22 +202,22 @@ def make_plot(version = None, Reynolds_number = 1.0e8, show = False):
 
     rddi_x = 0.03
     y_label = 2e-5 * max(y)
-    plot.text(10.0 * min(x), y_label, "COS", verticalalignment = "center", fontsize = fontsize + 10)
+    plot.text(70.0 * min(x), 1e2 * y_label, "COS", verticalalignment = "center", fontsize = fontsize + 6)
+    plot.text(20.0 * min(x), 1e-4 * y_label, "Viscous\nR-DDI", horizontalalignment = "center", fontsize = fontsize + 3)
+    plot.text(150.0 * min(x), 0.22 * y_label, "R-DDI", fontsize = fontsize, horizontalalignment =  "center", rotation = -30)
     plot.text(rddi_x, 3.0 * y_label, "R-DDI", fontsize = fontsize, horizontalalignment =  "center", rotation = 90)
-    plot.text(2.8 * min(x), 3e-5 * y_label, "R-DDI", fontsize = fontsize - 5, horizontalalignment =  "center", rotation = -30)
     plot.text(0.10 * max(x), y_label, "MRI", verticalalignment = "center", fontsize = fontsize + 6)
 
     y_mri_text = 2.3 * min(y)
-#    plot.text(0.3 * mri_x1, y_mri_text, r"$\beta = $", fontsize = fontsize - 5)
     plot.text(1.5 * mri_x2, 5.0 * y_mri_text, "MRI cutoffs with", fontsize = fontsize - 5, horizontalalignment = "center")
     #plot.text(1.1 * mri_x1, y_mri_text, r"$\beta = 10^{5}$", fontsize = fontsize - 5, horizontalalignment = "right")
     plot.text(0.3 * mri_x2, y_mri_text, r"$\beta = 5 \times 10^{3}$", fontsize = fontsize - 5, horizontalalignment = "center")
     plot.text(0.9 * mri_x3, y_mri_text, r"$10^{3}$", fontsize = fontsize - 5)
 
     if version is None:
-       plot.savefig("latter2010-v0-growth-rate-grid-normalized-log-formal.png", bbox_inches = "tight")
+       plot.savefig("latter2010-v0-growth-rate-grid-normalized-log-formal-b.png", bbox_inches = "tight")
     else:
-       plot.savefig("v%04d_latter2010-v0-growth-rate-grid-normalized-log-formal.png" % version, bbox_inches = "tight")
+       plot.savefig("v%04d_latter2010-v0-growth-rate-grid-normalized-log-formal-b.png" % version, bbox_inches = "tight")
 
     if show:
        plot.show()
@@ -228,10 +226,10 @@ def make_plot(version = None, Reynolds_number = 1.0e8, show = False):
 
 #make_plot(show = False)
 
-v = 9007
+v = 9001
 
 num_Reynolds = 1
-Reynolds_numbers = np.logspace(11, 11, num_Reynolds)
+Reynolds_numbers = np.logspace(5, 5, num_Reynolds)
 
 versions = np.array(range(num_Reynolds)) + v
 

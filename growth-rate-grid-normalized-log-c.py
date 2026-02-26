@@ -34,7 +34,7 @@ beta = 1.0e5
 alfven_velocity_squared = 2.0 * cs2 / beta
 #eta = 2.34e17 # 0.0
 
-N_squared = -0.1
+N_squared = -0.05
 
 def get_growth_rates(roberts_q = 1.0e-6, big_lambda = 1.0, Reynolds = 1.0e2):
     #big_lambda = 1.0e16 # 1.0
@@ -175,14 +175,12 @@ def make_plot(version = None, Reynolds_number = 1.0e8, show = False):
     cbar.set_label(r"$s_\mathrm{max}$ [$\Omega^{-1}$]", fontsize = fontsize, rotation = 270, labelpad = 25)
 
     # MRI cutoffs based on scale height
-    beta1 = 1e5; mri_x1 = np.sqrt(2) * np.power(beta1, -0.5)
-    beta2 = 5e3; mri_x2 = np.sqrt(2) * np.power(beta2, -0.5)
+    #beta1 = 1e5; mri_x1 = np.sqrt(2) * np.power(beta1, -0.5)
+    beta2 = 2e4; mri_x2 = np.sqrt(2) * np.power(beta2, -0.5)
     beta3 = 1e3; mri_x3 = np.sqrt(2) * np.power(beta3, -0.5)
 
-    #if N_squared < -0.10:
     #plot.plot([mri_x1, mri_x1], [40.0 * min(y), max(y)], c = 'k', linestyle = "--", alpha = 0.6)
     plot.plot([mri_x2, mri_x2], [40.0 * min(y), max(y)], c = 'k', linestyle = "--", alpha = 0.6)
-    #plot.plot([mri_x2, mri_x2], [40.0 * min(y), max(y)], c = 'k', linestyle = "--", alpha = 0.6)
     plot.plot([mri_x3, mri_x3], [40.0 * min(y), max(y)], c = 'k', linestyle = "-")
 
     plot.xlim(min(x), max(x))
@@ -202,7 +200,7 @@ def make_plot(version = None, Reynolds_number = 1.0e8, show = False):
     plot.text(x_text, y_text * 1.0 * y_line, r"$N^2 = %.2f$" % (N_squared), fontsize = fontsize - 4)
     #plot.text(x_text, y_text - 3.0 * y_line, r"$v_\mathrm{A}^2 = %.1e$" % (alfven_velocity_squared), fontsize = fontsize - 4)
 
-    rddi_x = 0.03
+    rddi_x = 0.023
     y_label = 2e-5 * max(y)
     plot.text(10.0 * min(x), y_label, "COS", verticalalignment = "center", fontsize = fontsize + 10)
     plot.text(rddi_x, 3.0 * y_label, "R-DDI", fontsize = fontsize, horizontalalignment =  "center", rotation = 90)
@@ -211,15 +209,15 @@ def make_plot(version = None, Reynolds_number = 1.0e8, show = False):
 
     y_mri_text = 2.3 * min(y)
 #    plot.text(0.3 * mri_x1, y_mri_text, r"$\beta = $", fontsize = fontsize - 5)
-    plot.text(1.5 * mri_x2, 5.0 * y_mri_text, "MRI cutoffs with", fontsize = fontsize - 5, horizontalalignment = "center")
+    plot.text(2.0 * mri_x2, 5.0 * y_mri_text, "MRI cutoffs with", fontsize = fontsize - 5, horizontalalignment = "center")
     #plot.text(1.1 * mri_x1, y_mri_text, r"$\beta = 10^{5}$", fontsize = fontsize - 5, horizontalalignment = "right")
-    plot.text(0.3 * mri_x2, y_mri_text, r"$\beta = 5 \times 10^{3}$", fontsize = fontsize - 5, horizontalalignment = "center")
+    plot.text(0.5 * mri_x2, y_mri_text, r"$\beta = 2 \times 10^{4}$", fontsize = fontsize - 5, horizontalalignment = "center")
     plot.text(0.9 * mri_x3, y_mri_text, r"$10^{3}$", fontsize = fontsize - 5)
 
     if version is None:
-       plot.savefig("latter2010-v0-growth-rate-grid-normalized-log-formal.png", bbox_inches = "tight")
+       plot.savefig("latter2010-v0-growth-rate-grid-normalized-log-formal-c.png", bbox_inches = "tight")
     else:
-       plot.savefig("v%04d_latter2010-v0-growth-rate-grid-normalized-log-formal.png" % version, bbox_inches = "tight")
+       plot.savefig("v%04d_latter2010-v0-growth-rate-grid-normalized-log-formal-c.png" % version, bbox_inches = "tight")
 
     if show:
        plot.show()
