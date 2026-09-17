@@ -6,6 +6,7 @@ import csv
 import matplotlib
 matplotlib.use('Agg')
 from matplotlib import pyplot as plot
+from matplotlib import rcParams as rc
 
 with open('analysis.txt', 'r') as f:
    reader = csv.reader(f)
@@ -22,7 +23,11 @@ with open('magnetic_analysis.txt', 'r') as f:
 smooth = lambda array, kernel_size : ff.gaussian_filter(array, kernel_size)
 
 linewidth = 3
-fontsize = 16
+fontsize = 20
+
+labelsize = 18
+rc['xtick.labelsize'] = labelsize
+rc['ytick.labelsize'] = labelsize
 
 plot.figure()
 
@@ -33,16 +38,17 @@ y3 = np.power(analysis[:, 4], 2) # uy^2
 y4 = np.power(analysis[:, 5], 2) # uz^2
 
 y_flux = analysis[:, 6] # ux uy
-y_fluxM = analysisM[:, 5] # Bx By
+y_fluxM = -1.0 * analysisM[:, 5] # - Bx By
 
 #print min(y3), max(y3)
 
-plot.plot(x, y_flux, linewidth = linewidth, c = 'b', label = r"$u_\mathrm{x} u_\mathrm{y}$ (+)")
-plot.plot(x, -y_flux, linewidth = linewidth, c = 'r', label = r"$u_\mathrm{x} u_\mathrm{y}$ (-)")
-plot.plot(x, y_fluxM, linewidth = linewidth, c = 'darkblue', label = r"$B_\mathrm{x} B_\mathrm{y}$ (+)")
-plot.plot(x, -y_fluxM, linewidth = linewidth, c = 'darkred', label = r"$B_\mathrm{x} B_\mathrm{y}$ (-)")
+#plot.plot(x, y_flux, linewidth = linewidth, c = 'b', label = r"$u_\mathrm{x} u_\mathrm{y}$ (+)")
+plot.plot(x, -y_flux, linewidth = linewidth, c = 'r', label = r"$u_\mathrm{x} u_\mathrm{y}$ $(-)$")
+plot.plot(x, y_fluxM, linewidth = linewidth, c = 'darkblue', label = r"$ - B_\mathrm{x} B_\mathrm{y}$ $(+)$")
+#plot.plot(x, -y_fluxM, linewidth = linewidth, c = 'darkred', label = r"$ - B_\mathrm{x} B_\mathrm{y}$ (-)")
+#plot.plot(x, -y_flux + y_fluxM, linewidth = linewidth, c = 'darkred', label = r"$ u_\mathrm{x} u_\mathrm{y} - B_\mathrm{x} B_\mathrm{y}$ $(-)$")
 
-plot.legend(loc = "upper left")
+plot.legend(loc = "lower right")
 
 #print(max(y3))
 
@@ -50,13 +56,13 @@ plot.legend(loc = "upper left")
 
 plot.xlim(x[0], x[-1])
 #plot.ylim(0, max(y))
-plot.ylim(1.0e-10, 1.0e-4)
+plot.ylim(1.0e-15, 1.0e-3)
 
 plot.yscale('log')
 
 plot.xlabel('t', fontsize = fontsize)
 plot.ylabel(r'$Q_\mathrm{x} Q_\mathrm{y}$', fontsize = fontsize)
-plot.title('Flux', fontsize = fontsize + 1)
+plot.title('Angular Momentum Flux', fontsize = fontsize + 1)
 
 cwd = os.getcwd().split("/")[-1]
 plot.savefig("flux-over-time-%s.png" % cwd, bbox_inches = 'tight')
